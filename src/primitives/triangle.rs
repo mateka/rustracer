@@ -8,6 +8,7 @@ use crate::{
     Transform3, Translation3, Vector3,
 };
 
+/// A triangle primitive
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Triangle {
     vertices: [Point3; 3],

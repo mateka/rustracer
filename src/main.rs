@@ -1,46 +1,8 @@
 use image::{ImageBuffer, Rgb};
-use nalgebra::{
-    geometry::Perspective3, Isometry3, Point2, Point3, Rotation3, Similarity3, Translation3, Unit,
-    Vector3,
-};
+use nalgebra::{Isometry3, Point2, Point3, Rotation3, Similarity3, Translation3, Vector3};
 
 use rustracer::primitives::Triangle;
-use rustracer::{Ray, RayTraceable};
-
-struct Viewport {
-    width: f32,
-    height: f32,
-    projection: Perspective3<f32>,
-}
-
-impl Viewport {
-    fn new(width: u32, height: u32, fovy: f32, znear: f32, zfar: f32) -> Viewport {
-        Viewport {
-            width: width as f32,
-            height: height as f32,
-            projection: Perspective3::new(width as f32 / height as f32, fovy, znear, zfar),
-        }
-    }
-
-    fn cast_ray(&self, screen_point: Point2<u32>) -> Ray {
-        let near_point = Point3::new(
-            -(screen_point.x as f32 / self.width as f32) + 0.5,
-            -(screen_point.y as f32 / self.height as f32) + 0.5,
-            -1.0,
-        );
-        let near_point = self.projection.unproject_point(&near_point);
-        let far_point = Point3::new(
-            -(screen_point.x as f32 / self.width as f32) + 0.5,
-            -(screen_point.y as f32 / self.height as f32) + 0.5,
-            1.0,
-        );
-        let far_point = self.projection.unproject_point(&far_point);
-        Ray {
-            origin: near_point,
-            direction: Unit::new_normalize(far_point - near_point),
-        }
-    }
-}
+use rustracer::{RayTraceable, Viewport};
 
 fn main() {
     let up_triangle = Triangle::new(
@@ -86,7 +48,7 @@ fn main() {
         1000.0,
     );
 
-    let eye = Point3::new(0.0f32, 0.0, -5.0);
+    let eye = Point3::new(0.0f32, 0.0, 5.0);
     let target = Point3::new(0.0f32, 0.0, 0.0);
     let camera = Isometry3::look_at_rh(&eye, &target, &Vector3::y()).inverse();
 
