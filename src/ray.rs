@@ -13,6 +13,15 @@ pub struct Ray {
     pub direction: Unit<Vector3>,
 }
 
+impl Ray {
+    pub fn new(origin: Point3, direction: Vector3) -> Ray {
+        Ray {
+            origin: origin,
+            direction: Unit::new_normalize(direction),
+        }
+    }
+}
+
 /// Trait for all types, which are ray traceable in 3D
 pub trait RayTraceable {
     /// Computes point of intersection of Self with ray.

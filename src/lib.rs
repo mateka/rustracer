@@ -15,4 +15,6 @@ type Quaternion = nalgebra::Quaternion<Scalar>;
 type Matrix4 = nalgebra::Matrix4<Scalar>;
 
 mod ray;
-pub use ray::Ray;
+pub use ray::{Ray, RayTraceable};
+
+pub mod primitives;
