@@ -14,8 +14,8 @@ pub struct Viewport {
 }
 
 impl Viewport {
-    pub fn new(width: u32, height: u32, fovy: Scalar, znear: Scalar, zfar: Scalar) -> Viewport {
-        Viewport {
+    pub fn new(width: u32, height: u32, fovy: Scalar, znear: Scalar, zfar: Scalar) -> Self {
+        Self {
             width: width as Scalar,
             height: height as Scalar,
             projection: Perspective3::new(width as Scalar / height as Scalar, fovy, znear, zfar),

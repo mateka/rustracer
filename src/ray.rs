@@ -15,8 +15,8 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub fn new(origin: Point3, direction: Vector3) -> Ray {
-        Ray {
+    pub fn new(origin: Point3, direction: Vector3) -> Self {
+        Self {
             origin: origin,
             direction: Unit::new_normalize(direction),
         }
