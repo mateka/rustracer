@@ -4,7 +4,7 @@ use nalgebra::Unit;
 use std::ops;
 
 use crate::{
-    ray::RayTraceable, Isometry3, Matrix3, Matrix4, Point3, Ray, Rotation3, Similarity3,
+    ray::RayTraceable, Isometry3, Matrix3, Matrix4, Point3, Ray, Rotation3, Scalar, Similarity3,
     Transform3, Translation3, Vector3,
 };
 
@@ -51,40 +51,31 @@ impl Triangle {
         let e2 = vertices[2] - vertices[0];
         Unit::new_normalize(e1.cross(&e2))
     }
-
-    fn is_inside(&self, point: &Point3) -> bool {
-        let edge1 = self.get_v(1) - self.get_v(0);
-        let edge2 = self.get_v(2) - self.get_v(1);
-        let edge3 = self.get_v(0) - self.get_v(2);
-        let v1 = point - self.get_v(0);
-        let v2 = point - self.get_v(1);
-        let v3 = point - self.get_v(2);
-
-        let norm = self.normal;
-        norm.dot(&edge1.cross(&v1)) > 0.0
-            && norm.dot(&edge2.cross(&v2)) > 0.0
-            && norm.dot(&edge3.cross(&v3)) > 0.0
-    }
 }
 
 impl RayTraceable for Triangle {
     fn intersects(&self, ray: &Ray) -> Option<Point3> {
-        let norm = self.normal;
-        if 0.0 == norm.dot(&ray.direction) {
+        let v0v1 = self.get_v(1) - self.get_v(0);
+        let v0v2 = self.get_v(2) - self.get_v(0);
+        let pvec = ray.direction.cross(&v0v2);
+        let determinant = v0v1.dot(&pvec);
+        if determinant.abs() <= Scalar::EPSILON {
             return None;
         }
-        let a_vector = self.get_v(0) - Point3::origin();
-        let distance_to_origin = norm.dot(&a_vector);
-        let origin_vector = ray.origin - Point3::origin();
-        let t = -(norm.dot(&origin_vector) + distance_to_origin) / norm.dot(&ray.direction);
+        let inv_det = 1.0 / determinant;
+        let tvec = ray.origin - self.get_v(0);
+        let u = tvec.dot(&pvec) * inv_det;
+        let qvec = tvec.cross(&v0v1);
+        let v = ray.direction.dot(&qvec) * inv_det;
+        if u < 0.0 || u > 1.0 || v < 0.0 || u + v > 1.0 {
+            return None;
+        }
+
+        let t = v0v2.dot(&qvec) * inv_det;
         if t < 0.0 {
             return None;
         }
-        let plane_point = ray.origin + t * ray.direction.into_inner();
-        if self.is_inside(&plane_point) {
-            return Some(plane_point);
-        }
-        None
+        Some(ray.origin + t * ray.direction.into_inner())
     }
 }
 
