@@ -86,18 +86,25 @@ impl<P: RayTraceable> PrimitivesWithMaterials<P> {
 mod tests {
     use super::*;
     use crate::Vector3;
-    use image::Rgb;
-
     #[test]
     fn tracing_empty_scene_yields_default_colour() {
-        let scene = Scene::new(Rgb([255u8, 255u8, 0u8]));
+        let scene = Scene::new(Colour {
+            red: 1.0,
+            green: 1.0,
+            blue: 0.0,
+        });
         let ray = Ray::new(Point3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 0.0, 1.0));
-        assert_eq!(Rgb([255u8, 255u8, 0u8]), scene.trace(&ray));
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 1.0, green: 1.0, blue: 0.0}, scene.trace(&ray));
     }
 
     #[test]
     fn tracing_with_miss_yields_default_colour() {
-        let mut scene = Scene::new(Rgb([255u8, 255u8, 0u8]));
+        let mut scene = Scene::new(Colour {
+            red: 1.0,
+            green: 1.0,
+            blue: 0.0,
+        });
         scene.add_triangle(
             Triangle::new([
                 Point3::new(2.0, 2.0, 0.0),
@@ -105,16 +112,25 @@ mod tests {
                 Point3::new(1.0, 2.0, 0.0),
             ]),
             Material {
-                colour: Rgb([0u8, 0u8, 0u8]),
+                colour: Colour {
+                    red: 0.0,
+                    green: 0.0,
+                    blue: 0.0,
+                },
             },
         );
         let ray = Ray::new(Point3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 0.0, 1.0));
-        assert_eq!(Rgb([255u8, 255u8, 0u8]), scene.trace(&ray));
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 1.0, green: 1.0, blue: 0.0}, scene.trace(&ray));
     }
 
     #[test]
     fn tracing_with_hit_yields_hitted_primitive_colour() {
-        let mut scene = Scene::new(Rgb([255u8, 255u8, 0u8]));
+        let mut scene = Scene::new(Colour {
+            red: 1.0,
+            green: 1.0,
+            blue: 0.0,
+        });
         scene.add_triangle(
             Triangle::new([
                 Point3::new(1.0, -1.0, 0.0),
@@ -122,16 +138,25 @@ mod tests {
                 Point3::new(-1.0, -1.0, 0.0),
             ]),
             Material {
-                colour: Rgb([0u8, 255u8, 0u8]),
+                colour: Colour {
+                    red: 0.0,
+                    green: 1.0,
+                    blue: 0.0,
+                },
             },
         );
         let ray = Ray::new(Point3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 0.0, 1.0));
-        assert_eq!(Rgb([0u8, 255u8, 0u8]), scene.trace(&ray));
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 0.0, green: 1.0, blue: 0.0}, scene.trace(&ray));
     }
 
     #[test]
     fn tracing_with_hit_yields_closest_hitted_primitive_colour() {
-        let mut scene = Scene::new(Rgb([255u8, 255u8, 0u8]));
+        let mut scene = Scene::new(Colour {
+            red: 1.0,
+            green: 1.0,
+            blue: 0.0,
+        });
         scene.add_triangle(
             Triangle::new([
                 Point3::new(1.0, -1.0, 1.1),
@@ -139,7 +164,11 @@ mod tests {
                 Point3::new(-1.0, -1.0, 1.1),
             ]),
             Material {
-                colour: Rgb([255u8, 0u8, 0u8]),
+                colour: Colour {
+                    red: 1.0,
+                    green: 0.0,
+                    blue: 0.0,
+                },
             },
         );
         scene.add_triangle(
@@ -149,11 +178,16 @@ mod tests {
                 Point3::new(-1.0, -1.0, 1.0),
             ]),
             Material {
-                colour: Rgb([0u8, 255u8, 0u8]),
+                colour: Colour {
+                    red: 0.0,
+                    green: 1.0,
+                    blue: 0.0,
+                },
             },
         );
         let ray = Ray::new(Point3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 0.0, 1.0));
-        assert_eq!(Rgb([0u8, 255u8, 0u8]), scene.trace(&ray));
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 0.0, green: 1.0, blue: 0.0}, scene.trace(&ray));
     }
 
     mod primitives_with_materials_tests {
@@ -169,7 +203,11 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.1),
                 ]),
                 Material {
-                    colour: Rgb([0u8, 0u8, 0u8]),
+                    colour: Colour {
+                        red: 0.0,
+                        green: 0.0,
+                        blue: 0.0,
+                    },
                 },
             );
             primitives.add(
@@ -179,12 +217,20 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.0),
                 ]),
                 Material {
-                    colour: Rgb([255u8, 255u8, 255u8]),
+                    colour: Colour {
+                        red: 1.0,
+                        green: 1.0,
+                        blue: 1.0,
+                    },
                 },
             );
             assert_eq!(
                 Material {
-                    colour: Rgb([255u8, 255u8, 255u8]),
+                    colour: Colour {
+                        red: 1.0,
+                        green: 1.0,
+                        blue: 1.0
+                    },
                 },
                 *primitives.get_material(1)
             );
@@ -207,7 +253,11 @@ mod tests {
                     Point3::new(1.0, 2.0, 0.0),
                 ]),
                 Material {
-                    colour: Rgb([0u8, 0u8, 0u8]),
+                    colour: Colour {
+                        red: 0.0,
+                        green: 0.0,
+                        blue: 0.0,
+                    },
                 },
             );
             let ray = Ray::new(Point3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 0.0, 1.0));
@@ -224,7 +274,11 @@ mod tests {
                     Point3::new(-1.0, -1.0, 0.0),
                 ]),
                 Material {
-                    colour: Rgb([0u8, 0u8, 0u8]),
+                    colour: Colour {
+                        red: 0.0,
+                        green: 0.0,
+                        blue: 0.0,
+                    },
                 },
             );
             let ray = Ray::new(Point3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 0.0, 1.0));
@@ -247,7 +301,11 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.1),
                 ]),
                 Material {
-                    colour: Rgb([0u8, 0u8, 0u8]),
+                    colour: Colour {
+                        red: 0.0,
+                        green: 0.0,
+                        blue: 0.0,
+                    },
                 },
             );
             primitives.add(
@@ -257,7 +315,11 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.0),
                 ]),
                 Material {
-                    colour: Rgb([0u8, 0u8, 0u8]),
+                    colour: Colour {
+                        red: 0.0,
+                        green: 0.0,
+                        blue: 0.0,
+                    },
                 },
             );
             let ray = Ray::new(Point3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 0.0, 1.0));

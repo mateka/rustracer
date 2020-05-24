@@ -1,4 +1,3 @@
-use image;
 use nalgebra;
 
 pub type Scalar = f32;
@@ -16,8 +15,6 @@ pub type Quaternion = nalgebra::Quaternion<Scalar>;
 // pub type Vector4 = nalgebra::Vector4<Scalar>;
 pub type Matrix4 = nalgebra::Matrix4<Scalar>;
 
-pub type Colour = image::Rgb<u8>; // TODO Use something, which is additive and multiplicable by scalar
-
 mod ray;
 pub use ray::{Ray, RayTraceable};
 
@@ -27,7 +24,7 @@ pub use viewport::{Perspective3, Viewport};
 pub mod primitives;
 
 mod material;
-pub use material::Material;
+pub use material::{Colour, Material};
 
 mod scene;
 pub use scene::Scene;
