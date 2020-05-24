@@ -3,7 +3,8 @@ use nalgebra::Unit;
 use std::ops;
 
 use crate::{
-    Isometry3, Matrix3, Matrix4, Point3, Rotation3, Similarity3, Transform3, Translation3, Vector3,
+    Isometry3, Matrix3, Matrix4, Point2, Point3, Rotation3, Similarity3, Transform3, Translation3,
+    Vector3,
 };
 
 /// 3D ray class for ray tracing.
@@ -27,6 +28,10 @@ pub trait RayTraceable {
     /// Computes point of intersection of Self with ray.
     /// If there is no intersection, it returns None.
     fn intersects(&self, ray: &Ray) -> Option<Point3>;
+
+    /// Computes 2D local coordinates of 3D point inside ray traceable primitive.
+    /// It can be used for example as a texture coordinates.
+    fn local_2d_coordinates(&self, point: &Point3) -> Point2;
 }
 
 impl_op_ex!(*|a: &Matrix3, b: &Ray| -> Ray {

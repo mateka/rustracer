@@ -4,8 +4,8 @@ use nalgebra::Unit;
 use std::ops;
 
 use crate::{
-    ray::RayTraceable, Isometry3, Matrix3, Matrix4, Point3, Ray, Rotation3, Scalar, Similarity3,
-    Transform3, Translation3, Vector3,
+    ray::RayTraceable, Isometry3, Matrix3, Matrix4, Point2, Point3, Ray, Rotation3, Scalar,
+    Similarity3, Transform3, Translation3, Vector3,
 };
 
 /// A triangle primitive
@@ -51,6 +51,12 @@ impl Triangle {
         let e2 = vertices[2] - vertices[0];
         Unit::new_normalize(e1.cross(&e2))
     }
+
+    fn doubled_area_of(vertices: [Point3; 3]) -> Scalar {
+        let v0v1 = vertices[1] - vertices[0];
+        let v0v2 = vertices[2] - vertices[0];
+        v0v1.cross(&v0v2).norm()
+    }
 }
 
 impl RayTraceable for Triangle {
@@ -76,6 +82,14 @@ impl RayTraceable for Triangle {
             return None;
         }
         Some(ray.origin + t * ray.direction.into_inner())
+    }
+
+    fn local_2d_coordinates(&self, point: &Point3) -> Point2 {
+        // See https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/barycentric-coordinates
+        let self_area = Triangle::doubled_area_of(self.vertices);
+        let cap_area = Triangle::doubled_area_of([*self.get_v(0), *self.get_v(2), *point]);
+        let abp_area = Triangle::doubled_area_of([*self.get_v(0), *self.get_v(1), *point]);
+        Point2::new(cap_area / self_area, abp_area / self_area)
     }
 }
 
@@ -432,5 +446,51 @@ mod tests {
         assert_eq!(&matrix * tri, expected);
         assert_eq!(matrix * &tri, expected);
         assert_eq!(&matrix * &tri, expected);
+    }
+
+    #[test]
+    fn triangle_vertices_2d_coordinates() {
+        let tri = Triangle::new(
+            [
+                Point3::new(1.0, 0.0, 0.0),
+                Point3::new(0.0, 1.0, 0.0),
+                Point3::new(-1.0, 0.0, 0.0),
+            ],
+            Rgb([215u8, 225u8, 0u8]),
+        );
+
+        assert_eq!(
+            Point2::new(0.0, 0.0),
+            tri.local_2d_coordinates(&Point3::new(1.0, 0.0, 0.0))
+        );
+        assert_eq!(
+            Point2::new(1.0, 0.0),
+            tri.local_2d_coordinates(&Point3::new(0.0, 1.0, 0.0))
+        );
+        assert_eq!(
+            Point2::new(0.0, 1.0),
+            tri.local_2d_coordinates(&Point3::new(-1.0, 0.0, 0.0))
+        );
+    }
+
+    #[test]
+    fn triangle_inside_points_2d_coordinates() {
+        let tri = Triangle::new(
+            [
+                Point3::new(1.0, 0.0, 0.0),
+                Point3::new(0.0, 1.0, 0.0),
+                Point3::new(-1.0, 0.0, 0.0),
+            ],
+            Rgb([215u8, 225u8, 0u8]),
+        );
+
+        assert_eq!(
+            Point2::new(0.5, 0.25),
+            tri.local_2d_coordinates(&Point3::new(0.0, 0.5, 0.0))
+        );
+        assert_eq!(
+            Point2::new(0.5, 0.5),
+            tri.local_2d_coordinates(&Point3::new(-0.5, 0.5, 0.0))
+        );
     }
 }
