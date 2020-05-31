@@ -11,57 +11,56 @@ fn main() {
         Point3::new(-1.0, 0.0, 0.0),
     ]);
 
-    let scale02 = Similarity3::from_scaling(0.2f32);
-    let translate_x21 = Translation3::new(2.1f32, 0.0, 0.0);
-    let translate_x_21 = Translation3::new(-2.1f32, 0.0, 0.0);
-    let rotate = Rotation3::new(Vector3::new(0.0f32, 0.0, 3.14));
-
-    let mut scene = Scene::new(Colour {
-        red: 0.0,
-        green: 0.0,
-        blue: 0.0,
-    });
-    scene.add_triangle(
-        up_triangle,
+    let scale = Similarity3::from_scaling(0.5f32);
+    let translate_red = Translation3::new(0.0f32, 0.4, 1.5);
+    let translate_green = Translation3::new(0.0f32, 0.6, 2.5);
+    let rotate = Rotation3::new(Vector3::new(0.0f32, 3.14 * 0.1, 0.0));
+    let mut scene = Scene::new(
         Material {
-            colour: Colour {
-                red: 1.0,
-                green: 1.0,
-                blue: 0.0,
-            },
-        },
-    );
-    scene.add_triangle(
-        translate_x21 * scale02 * up_triangle,
-        Material {
-            colour: Colour {
-                red: 1.0,
-                green: 0.0,
-                blue: 0.0,
-            },
-        },
-    );
-    scene.add_triangle(
-        translate_x_21.to_homogeneous()
-            * scale02.to_homogeneous()
-            * rotate.to_homogeneous()
-            * up_triangle,
-        Material {
-            colour: Colour {
-                red: 0.0,
-                green: 1.0,
-                blue: 0.0,
-            },
-        },
-    );
-    scene.add_triangle(
-        Rotation3::new(Vector3::new(0.0, 3.14 / 4.0, 0.0)) * up_triangle,
-        Material {
-            colour: Colour {
+            diffuse: Colour {
                 red: 0.0,
                 green: 0.0,
+                blue: 0.0,
+            },
+            emission: Colour {
+                red: 0.75,
+                green: 0.75,
                 blue: 1.0,
             },
+        },
+        10,
+    );
+    scene.add_triangle(
+        rotate * up_triangle,
+        Material {
+            diffuse: Colour {
+                red: 1.0,
+                green: 1.0,
+                blue: 0.0,
+            },
+            ..Default::default()
+        },
+    );
+    scene.add_triangle(
+        rotate * (translate_red * scale * up_triangle),
+        Material {
+            diffuse: Colour {
+                red: 1.0,
+                green: 0.0,
+                blue: 0.0,
+            },
+            ..Default::default()
+        },
+    );
+    scene.add_triangle(
+        rotate * (translate_green * scale * up_triangle),
+        Material {
+            diffuse: Colour {
+                red: 0.2,
+                green: 1.0,
+                blue: 0.0,
+            },
+            ..Default::default()
         },
     );
 

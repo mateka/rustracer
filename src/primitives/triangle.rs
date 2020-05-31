@@ -26,10 +26,6 @@ impl Triangle {
         &self.vertices[index]
     }
 
-    pub fn get_normal(&self) -> &Unit<Vector3> {
-        &self.normal
-    }
-
     pub fn set_v(&mut self, index: usize, value: Point3) {
         self.vertices[index] = value;
         self.normal = Triangle::calculate_normal(self.vertices);
@@ -49,6 +45,10 @@ impl Triangle {
 }
 
 impl RayTraceable for Triangle {
+    fn get_normal(&self) -> Unit<Vector3> {
+        self.normal
+    }
+
     fn intersects(&self, ray: &Ray) -> Option<Point3> {
         let v0v1 = self.get_v(1) - self.get_v(0);
         let v0v2 = self.get_v(2) - self.get_v(0);
@@ -132,7 +132,7 @@ mod tests {
         assert_eq!(tri.get_v(2), &Point3::new(0.5, 0.0, 0.0));
         assert_eq!(
             tri.get_normal(),
-            &Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0))
+            Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0))
         );
     }
 

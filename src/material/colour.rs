@@ -2,7 +2,7 @@ use image::Rgb;
 use impl_ops::*;
 use std::ops;
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone, Default)]
 pub struct Colour {
     pub red: f32,
     pub green: f32,

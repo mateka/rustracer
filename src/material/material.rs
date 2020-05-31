@@ -1,6 +1,14 @@
 use crate::Colour;
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone, Default)]
 pub struct Material {
-    pub colour: Colour,
+    pub emission: Colour,
+    pub diffuse: Colour,
+}
+
+impl Material {
+    pub fn combine(&mut self, other: &Material) {
+        self.diffuse = self.diffuse * other.emission;
+        self.emission = self.emission + self.diffuse;
+    }
 }
