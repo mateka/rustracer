@@ -208,11 +208,8 @@ mod tests {
         fn tracing_empty_scene_yields_default_colour() {
             let scene = Scene::new(
                 Material {
-                    diffuse: Colour {
-                        red: 1.0,
-                        green: 1.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
                     ..Default::default()
                 },
                 0,
@@ -226,11 +223,8 @@ mod tests {
         fn tracing_with_miss_yields_default_colour() {
             let mut scene = Scene::new(
                 Material {
-                    diffuse: Colour {
-                        red: 1.0,
-                        green: 1.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
                     ..Default::default()
                 },
                 0,
@@ -242,11 +236,8 @@ mod tests {
                     Point3::new(1.0, 2.0, 0.0),
                 ]),
                 Material {
-                    emission: Colour {
-                        red: 0.0,
-                        green: 0.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    emission: Colour {red: 0.0, green: 0.0, blue: 0.0,},
                     ..Default::default()
                 },
             );
@@ -259,11 +250,8 @@ mod tests {
         fn tracing_with_hit_yields_hitted_primitive_colour() {
             let mut scene = Scene::new(
                 Material {
-                    diffuse: Colour {
-                        red: 1.0,
-                        green: 1.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
                     ..Default::default()
                 },
                 0,
@@ -275,11 +263,8 @@ mod tests {
                     Point3::new(-1.0, -1.0, 0.0),
                 ]),
                 Material {
-                    diffuse: Colour {
-                        red: 0.0,
-                        green: 1.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 0.0, green: 1.0, blue: 0.0,},
                     ..Default::default()
                 },
             );
@@ -292,11 +277,8 @@ mod tests {
         fn tracing_with_hit_yields_closest_hitted_primitive_colour() {
             let mut scene = Scene::new(
                 Material {
-                    diffuse: Colour {
-                        red: 1.0,
-                        green: 1.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
                     ..Default::default()
                 },
                 0,
@@ -308,11 +290,8 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.1),
                 ]),
                 Material {
-                    diffuse: Colour {
-                        red: 1.0,
-                        green: 0.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 1.0, green: 0.0, blue: 0.0,},
                     ..Default::default()
                 },
             );
@@ -323,11 +302,8 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.0),
                 ]),
                 Material {
-                    diffuse: Colour {
-                        red: 0.0,
-                        green: 1.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 0.0, green: 1.0, blue: 0.0,},
                     ..Default::default()
                 },
             );
@@ -350,11 +326,8 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.1),
                 ]),
                 Material {
-                    emission: Colour {
-                        red: 0.0,
-                        green: 0.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    emission: Colour {red: 0.0, green: 0.0, blue: 0.0,},
                     ..Default::default()
                 },
             );
@@ -365,11 +338,8 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.0),
                 ]),
                 Material {
-                    emission: Colour {
-                        red: 1.0,
-                        green: 1.0,
-                        blue: 1.0,
-                    },
+                    #[rustfmt::skip]
+                    emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                     ..Default::default()
                 },
             );
@@ -383,11 +353,8 @@ mod tests {
             );
             assert_eq!(
                 Material {
-                    emission: Colour {
-                        red: 1.0,
-                        green: 1.0,
-                        blue: 1.0
-                    },
+                    #[rustfmt::skip]
+                    emission: Colour {red: 1.0, green: 1.0, blue: 1.0},
                     ..Default::default()
                 },
                 *primitives.get_material(1)
@@ -411,11 +378,8 @@ mod tests {
                     Point3::new(1.0, 2.0, 0.0),
                 ]),
                 Material {
-                    emission: Colour {
-                        red: 0.0,
-                        green: 0.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    emission: Colour {red: 0.0, green: 0.0, blue: 0.0,},
                     ..Default::default()
                 },
             );
@@ -433,11 +397,8 @@ mod tests {
                     Point3::new(-1.0, -1.0, 0.0),
                 ]),
                 Material {
-                    emission: Colour {
-                        red: 0.0,
-                        green: 0.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    emission: Colour {red: 0.0, green: 0.0, blue: 0.0,},
                     ..Default::default()
                 },
             );
@@ -461,11 +422,8 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.1),
                 ]),
                 Material {
-                    emission: Colour {
-                        red: 0.0,
-                        green: 0.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    emission: Colour {red: 0.0, green: 0.0, blue: 0.0,},
                     ..Default::default()
                 },
             );
@@ -476,11 +434,8 @@ mod tests {
                     Point3::new(-1.0, -1.0, 1.0),
                 ]),
                 Material {
-                    emission: Colour {
-                        red: 0.0,
-                        green: 0.0,
-                        blue: 0.0,
-                    },
+                    #[rustfmt::skip]
+                    emission: Colour {red: 0.0, green: 0.0, blue: 0.0,},
                     ..Default::default()
                 },
             );

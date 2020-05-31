@@ -17,49 +17,34 @@ fn main() {
     let rotate = Rotation3::new(Vector3::new(0.0f32, 3.14 * 0.1, 0.0));
     let mut scene = Scene::new(
         Material {
-            diffuse: Colour {
-                red: 0.0,
-                green: 0.0,
-                blue: 0.0,
-            },
-            emission: Colour {
-                red: 0.75,
-                green: 0.75,
-                blue: 1.0,
-            },
+            #[rustfmt::skip]
+            diffuse: Colour {red: 0.0, green: 0.0, blue: 0.0,},
+            #[rustfmt::skip]
+            emission: Colour {red: 0.75, green: 0.75, blue: 1.0,},
         },
         10,
     );
     scene.add_triangle(
         rotate * up_triangle,
         Material {
-            diffuse: Colour {
-                red: 1.0,
-                green: 1.0,
-                blue: 0.0,
-            },
+            #[rustfmt::skip]
+            diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
             ..Default::default()
         },
     );
     scene.add_triangle(
         rotate * (translate_red * scale * up_triangle),
         Material {
-            diffuse: Colour {
-                red: 1.0,
-                green: 0.0,
-                blue: 0.0,
-            },
+            #[rustfmt::skip]
+            diffuse: Colour {red: 1.0, green: 0.0, blue: 0.0,},
             ..Default::default()
         },
     );
     scene.add_triangle(
         rotate * (translate_green * scale * up_triangle),
         Material {
-            diffuse: Colour {
-                red: 0.2,
-                green: 1.0,
-                blue: 0.0,
-            },
+            #[rustfmt::skip]
+            diffuse: Colour {red: 0.2, green: 1.0, blue: 0.0,},
             ..Default::default()
         },
     );
