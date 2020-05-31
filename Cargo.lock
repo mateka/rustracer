@@ -16,6 +16,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "auto_ops"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7470d559fc2c985f76acb6899f79c4d01bef3b1ec56aaf33c0617feb4995945"
+
+[[package]]
 name = "autocfg"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -179,12 +185,6 @@ dependencies = [
  "scoped_threadpool",
  "tiff",
 ]
-
-[[package]]
-name = "impl_ops"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90f97a5f38dd3ccfbe7aa80f4a0c00930f21b922c74195be0201c51028f22dcf"
 
 [[package]]
 name = "inflate"
@@ -490,8 +490,8 @@ dependencies = [
 name = "rustracer"
 version = "0.1.0"
 dependencies = [
+ "auto_ops",
  "image",
- "impl_ops",
  "nalgebra",
 ]
 

@@ -1,6 +1,5 @@
+use auto_ops::*;
 use image::Rgb;
-use impl_ops::*;
-use std::ops;
 
 #[derive(Debug, PartialEq, Copy, Clone, Default)]
 pub struct Colour {
@@ -49,12 +48,24 @@ impl_op_ex!(+|a: &Colour, b: &Colour| -> Colour {
     }
 });
 
+impl_op_ex!(+=|a: &mut Colour, b: &Colour| {
+    a.red += b.red;
+    a.green += b.green;
+    a.blue += b.blue;
+});
+
 impl_op_ex!(-|a: &Colour, b: &Colour| -> Colour {
     Colour {
         red: a.red - b.red,
         green: a.green - b.green,
         blue: a.blue - b.blue,
     }
+});
+
+impl_op_ex!(-=|a: &mut Colour, b: &Colour| {
+    a.red -= b.red;
+    a.green -= b.green;
+    a.blue -= b.blue;
 });
 
 impl_op_ex!(*|a: &Colour, b: &Colour| -> Colour {
@@ -65,6 +76,12 @@ impl_op_ex!(*|a: &Colour, b: &Colour| -> Colour {
     }
 });
 
+impl_op_ex!(*=|a: &mut Colour, b: &Colour| {
+    a.red *= b.red;
+    a.green *= b.green;
+    a.blue *= b.blue;
+});
+
 impl_op_ex!(/|a: &Colour, b: &Colour| -> Colour {
     Colour {
         red: a.red / b.red,
@@ -73,7 +90,13 @@ impl_op_ex!(/|a: &Colour, b: &Colour| -> Colour {
     }
 });
 
-impl_op_ex!(*|s: &f32, c: &Colour| -> Colour {
+impl_op_ex!(/=|a: &mut Colour, b: &Colour| {
+    a.red /= b.red;
+    a.green /= b.green;
+    a.blue /= b.blue;
+});
+
+impl_op_ex_commutative!(*|c: &Colour, s: &f32| -> Colour {
     Colour {
         red: s * c.red,
         green: s * c.green,
@@ -81,12 +104,10 @@ impl_op_ex!(*|s: &f32, c: &Colour| -> Colour {
     }
 });
 
-impl_op_ex!(*|c: &Colour, s: &f32| -> Colour {
-    Colour {
-        red: s * c.red,
-        green: s * c.green,
-        blue: s * c.blue,
-    }
+impl_op_ex!(*=|c: &mut Colour, s: &f32| {
+    c.red *= s;
+    c.green *= s;
+    c.blue *= s;
 });
 
 impl_op_ex!(/|c: &Colour, s: &f32| -> Colour {
@@ -95,6 +116,12 @@ impl_op_ex!(/|c: &Colour, s: &f32| -> Colour {
         green: c.green / s,
         blue: c.blue / s,
     }
+});
+
+impl_op_ex!(/=|c: &mut Colour, s: &f32| {
+    c.red /= s;
+    c.green /= s;
+    c.blue /= s;
 });
 
 #[cfg(test)]
@@ -140,6 +167,15 @@ mod tests {
     }
 
     #[test]
+    fn colours_can_be_multiplied_inplace_by_scalar() {
+        #[rustfmt::skip]
+        let mut c = Colour {red: 1.0, green: 2.0, blue: 3.0,};
+        c *= 2.0;
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 2.0, green: 4.0, blue: 6.0}, c);
+    }
+
+    #[test]
     fn colours_can_be_divided_by_scalar() {
         #[rustfmt::skip]
         let c = Colour {red: 4.0, green: 8.0, blue: 12.0,};
@@ -151,6 +187,15 @@ mod tests {
         assert_eq!(Colour{red: 2.0, green: 4.0, blue: 6.0}, &c / 2.0);
         #[rustfmt::skip]
         assert_eq!(Colour{red: 2.0, green: 4.0, blue: 6.0}, c / 2.0);
+    }
+
+    #[test]
+    fn colours_can_be_divided_inplace_by_scalar() {
+        #[rustfmt::skip]
+        let mut c = Colour {red: 4.0, green: 8.0, blue: 12.0,};
+        c /= 2.0;
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 2.0, green: 4.0, blue: 6.0}, c);
     }
 
     #[test]
@@ -170,6 +215,17 @@ mod tests {
     }
 
     #[test]
+    fn colours_can_be_added_inplace() {
+        #[rustfmt::skip]
+        let mut a = Colour {red: 1.0, green: 2.0, blue: 3.0,};
+        #[rustfmt::skip]
+        let b = Colour {red: 2.0, green: 3.0, blue: 5.0,};
+        a += b;
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 3.0, green: 5.0, blue: 8.0}, a);
+    }
+
+    #[test]
     fn colours_can_be_substracted() {
         #[rustfmt::skip]
         let a = Colour {red: 1.0, green: 2.0, blue: 3.0,};
@@ -183,6 +239,17 @@ mod tests {
         assert_eq!(Colour{red: -1.0, green: -1.0, blue: -2.0}, &a - b);
         #[rustfmt::skip]
         assert_eq!(Colour{red: -1.0, green: -1.0, blue: -2.0}, a - b);
+    }
+
+    #[test]
+    fn colours_can_be_substracted_inplace() {
+        #[rustfmt::skip]
+        let mut a = Colour {red: 1.0, green: 2.0, blue: 3.0,};
+        #[rustfmt::skip]
+        let b = Colour {red: 2.0, green: 3.0, blue: 5.0,};
+        a -= b;
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: -1.0, green: -1.0, blue: -2.0}, a);
     }
 
     #[test]
@@ -202,6 +269,17 @@ mod tests {
     }
 
     #[test]
+    fn colours_can_be_multiplied_inplace() {
+        #[rustfmt::skip]
+        let mut a = Colour {red: 1.0, green: 2.0, blue: 3.0,};
+        #[rustfmt::skip]
+        let b = Colour {red: 2.0, green: 3.0, blue: 5.0,};
+        a *= b;
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 2.0, green: 6.0, blue: 15.0}, a);
+    }
+
+    #[test]
     fn colours_can_be_divided() {
         #[rustfmt::skip]
         let a = Colour {red: 1.0, green: 2.0, blue: 3.0,};
@@ -215,6 +293,17 @@ mod tests {
         assert_eq!(Colour{red: 0.5, green: 2.0 / 3.0, blue: 3.0 / 5.0}, &a / b);
         #[rustfmt::skip]
         assert_eq!(Colour{red: 0.5, green: 2.0 / 3.0, blue: 3.0 / 5.0}, a / b);
+    }
+
+    #[test]
+    fn colours_can_be_divided_inplace() {
+        #[rustfmt::skip]
+        let mut a = Colour {red: 1.0, green: 2.0, blue: 3.0,};
+        #[rustfmt::skip]
+        let b = Colour {red: 2.0, green: 3.0, blue: 5.0,};
+        a /= b;
+        #[rustfmt::skip]
+        assert_eq!(Colour{red: 0.5, green: 2.0 / 3.0, blue: 3.0 / 5.0}, a);
     }
 
     #[test]

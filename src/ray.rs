@@ -1,10 +1,9 @@
-use impl_ops::*;
+use auto_ops::*;
 use nalgebra::Unit;
-use std::ops;
 
 use crate::{
-    Isometry3, Matrix3, Matrix4, Point2, Point3, Rotation3, Similarity3, Transform3, Translation3,
-    Vector3,
+    Isometry3, Matrix3, Matrix4, Point2, Point3, Rotation3, Scalar, Similarity3, Transform3,
+    Translation3, Vector3,
 };
 
 /// 3D ray class for ray tracing.
@@ -64,6 +63,15 @@ impl_op_ex!(*|a: &Isometry3, b: &Ray| -> Ray {
         direction: Unit::new_normalize(a * b.direction.into_inner()),
     }
 });
+
+impl_op_ex!(
+    *|a: &nalgebra::Isometry<Scalar, nalgebra::U3, Rotation3>, b: &Ray| -> Ray {
+        Ray {
+            origin: a * b.origin,
+            direction: Unit::new_normalize(a * b.direction.into_inner()),
+        }
+    }
+);
 
 impl_op_ex!(*|a: &Similarity3, b: &Ray| -> Ray {
     Ray {
@@ -154,6 +162,25 @@ mod tests {
         assert_eq!(&translation * ray, expected);
         assert_eq!(translation * &ray, expected);
         assert_eq!(&translation * &ray, expected);
+    }
+
+    #[test]
+    fn ray_can_be_rotated_and_translated_by_two_transforms() {
+        let origin = Point3::new(1.0, 2.0, -7.0);
+        let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
+        let ray = Ray {
+            origin: origin,
+            direction: direction,
+        };
+        let rotation = Rotation3::new(Vector3::new(1.57, 0.0, -0.75));
+        let translation = Translation3::new(-1.0, 2.5, 0.0);
+        let expected = Ray {
+            origin: rotation * translation * origin,
+            direction: Unit::new_normalize(rotation * direction.into_inner()),
+        };
+
+        assert_eq!(rotation * translation * ray, expected);
+        assert_eq!(rotation * translation * &ray, expected);
     }
 
     #[test]

@@ -155,7 +155,7 @@ mod tests {
             },
         );
         scene.add_triangle(
-            rotation * (Translation3::new(0.5f32, 0.0, 2.0) * triangle),
+            rotation * Translation3::new(0.5f32, 0.0, 2.0) * triangle,
             Material {
                 #[rustfmt::skip]
                 diffuse: Colour {red: 1.0, green: 0.0, blue: 0.0,},

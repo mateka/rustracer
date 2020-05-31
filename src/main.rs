@@ -33,7 +33,7 @@ fn main() {
         },
     );
     scene.add_triangle(
-        rotate * (translate_red * scale * up_triangle),
+        rotate * translate_red * (scale * up_triangle),
         Material {
             #[rustfmt::skip]
             diffuse: Colour {red: 1.0, green: 0.0, blue: 0.0,},
@@ -41,7 +41,7 @@ fn main() {
         },
     );
     scene.add_triangle(
-        rotate * (translate_green * scale * up_triangle),
+        rotate * translate_green * (scale * up_triangle),
         Material {
             #[rustfmt::skip]
             diffuse: Colour {red: 0.2, green: 1.0, blue: 0.0,},

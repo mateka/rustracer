@@ -8,7 +8,7 @@ pub struct Material {
 
 impl Material {
     pub fn combine(&mut self, other: &Material) {
-        self.diffuse = self.diffuse * other.emission;
-        self.emission = self.emission + self.diffuse;
+        self.diffuse *= other.emission;
+        self.emission += self.diffuse;
     }
 }

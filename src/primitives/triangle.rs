@@ -1,6 +1,5 @@
-use impl_ops::*;
+use auto_ops::*;
 use nalgebra::Unit;
-use std::ops;
 
 use crate::{
     ray::RayTraceable, Isometry3, Matrix3, Matrix4, Point2, Point3, Ray, Rotation3, Scalar,
@@ -97,6 +96,12 @@ impl_op_ex!(*|a: &Translation3, b: &Triangle| -> Triangle {
 impl_op_ex!(*|a: &Isometry3, b: &Triangle| -> Triangle {
     Triangle::new([a * b.vertices[0], a * b.vertices[1], a * b.vertices[2]])
 });
+
+impl_op_ex!(
+    *|a: &nalgebra::Isometry<Scalar, nalgebra::U3, Rotation3>, b: &Triangle| -> Triangle {
+        Triangle::new([a * b.vertices[0], a * b.vertices[1], a * b.vertices[2]])
+    }
+);
 
 impl_op_ex!(*|a: &Similarity3, b: &Triangle| -> Triangle {
     Triangle::new([a * b.vertices[0], a * b.vertices[1], a * b.vertices[2]])
@@ -243,6 +248,25 @@ mod tests {
         assert_eq!(&translation * tri, expected);
         assert_eq!(translation * &tri, expected);
         assert_eq!(&translation * &tri, expected);
+    }
+
+    #[test]
+    fn triangle_can_be_rotated_and_translated_by_two_transforms() {
+        let tri = Triangle::new([
+            Point3::new(1.0, 0.0, 0.0),
+            Point3::new(0.0, 1.0, 0.0),
+            Point3::new(-1.0, 0.0, 0.0),
+        ]);
+        let rotation = Rotation3::new(Vector3::new(1.57, 0.0, -0.75));
+        let translation = Translation3::new(-1.0, 2.5, 0.0);
+        let expected = Triangle::new([
+            rotation * translation * Point3::new(1.0, 0.0, 0.0),
+            rotation * translation * Point3::new(0.0, 1.0, 0.0),
+            rotation * translation * Point3::new(-1.0, 0.0, 0.0),
+        ]);
+
+        assert_eq!(rotation * translation * tri, expected);
+        assert_eq!(rotation * translation * &tri, expected);
     }
 
     #[test]
