@@ -8,6 +8,13 @@ struct HitResult {
     pub index: usize,
 }
 
+/// Helper struct describing trace result
+#[derive(Debug, PartialEq, Copy, Clone, Default)]
+struct TraceResult {
+    pub diffuse: Colour,
+    pub emission: Colour,
+}
+
 /// Scene helper to organize and ray trace primitives of one type
 #[derive(Debug, PartialEq, Clone)]
 struct PrimitivesWithMaterials<P: RayTraceable> {
@@ -43,20 +50,26 @@ impl Scene {
         self.trace_until(ray, 0).diffuse
     }
 
-    fn trace_until(&self, ray: &Ray, step: usize) -> Material {
+    fn trace_until(&self, ray: &Ray, step: usize) -> TraceResult {
         let hit = self.closest_hit(ray);
         if hit == None {
-            return self.default_material;
+            return TraceResult::from(self.default_material);
         }
         let hit = hit.unwrap();
-        let mut material = self.triangles.get_material(hit.index).clone();
+        let mut trace_result = TraceResult {
+            ..Default::default()
+        };
 
         if step < self.recursion_depth {
             let reflected_ray = self.get_reflected_ray(&ray, &hit);
-            let mtl = self.trace_until(&reflected_ray, step + 1);
-            material.combine(&mtl);
+            let tr = self.trace_until(&reflected_ray, step + 1);
+            trace_result.add_light(&tr);
+        } else {
+            trace_result = TraceResult::from(self.default_material);
         }
-        material
+
+        let material = self.triangles.get_material(hit.index);
+        trace_result.apply_to(material)
     }
 
     fn closest_hit(&self, ray: &Ray) -> Option<HitResult> {
@@ -118,6 +131,28 @@ impl<P: RayTraceable> PrimitivesWithMaterials<P> {
 
     pub fn get_material(&self, index: usize) -> &Material {
         &self.materials[index]
+    }
+}
+
+impl TraceResult {
+    pub fn add_light(&mut self, other: &Self) {
+        self.emission += other.emission;
+    }
+
+    pub fn apply_to(&self, material: &Material) -> Self {
+        Self {
+            emission: material.emission + material.diffuse * self.emission,
+            diffuse: material.diffuse * self.emission,
+        }
+    }
+}
+
+impl From<Material> for TraceResult {
+    fn from(material: Material) -> Self {
+        Self {
+            emission: material.emission,
+            diffuse: material.diffuse,
+        }
     }
 }
 
@@ -210,7 +245,8 @@ mod tests {
                 Material {
                     #[rustfmt::skip]
                     diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
-                    ..Default::default()
+                    #[rustfmt::skip]
+                    emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                 },
                 0,
             );
@@ -225,7 +261,8 @@ mod tests {
                 Material {
                     #[rustfmt::skip]
                     diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
-                    ..Default::default()
+                    #[rustfmt::skip]
+                    emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                 },
                 0,
             );
@@ -252,7 +289,8 @@ mod tests {
                 Material {
                     #[rustfmt::skip]
                     diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
-                    ..Default::default()
+                    #[rustfmt::skip]
+                    emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                 },
                 0,
             );
@@ -279,7 +317,8 @@ mod tests {
                 Material {
                     #[rustfmt::skip]
                     diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
-                    ..Default::default()
+                    #[rustfmt::skip]
+                    emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                 },
                 0,
             );
@@ -446,6 +485,56 @@ mod tests {
                     point: Point3::new(0.0, 0.0, 1.0)
                 }),
                 primitives.closest_hit(&ray)
+            );
+        }
+    }
+
+    mod trace_result_tests {
+        use super::*;
+
+        #[test]
+        fn trace_result_can_be_created_from_material() {
+            let material = Material {
+                #[rustfmt::skip]
+                diffuse: Colour {red: 0.0, green: 0.0, blue: 0.0,},
+                #[rustfmt::skip]
+                emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
+            };
+            let trace_result = TraceResult::from(material);
+            assert_eq!(
+                trace_result,
+                TraceResult {
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 0.0, green: 0.0, blue: 0.0,},
+                    #[rustfmt::skip]
+                    emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
+                }
+            );
+        }
+
+        #[test]
+        fn trace_results_can_add_lights() {
+            let mut tr1 = TraceResult {
+                #[rustfmt::skip]
+                diffuse: Colour {red: 1.0, green: 0.0, blue: 0.0,},
+                #[rustfmt::skip]
+                emission: Colour {red: 1.0, green: 0.0, blue: 0.25,},
+            };
+            let tr2 = TraceResult {
+                #[rustfmt::skip]
+                diffuse: Colour {red: 0.0, green: 1.0, blue: 0.0,},
+                #[rustfmt::skip]
+                emission: Colour {red: 0.0, green: 1.0, blue: 0.35,},
+            };
+            tr1.add_light(&tr2);
+            assert_eq!(
+                tr1,
+                TraceResult {
+                    #[rustfmt::skip]
+                    diffuse: Colour {red: 1.0, green: 0.0, blue: 0.0,},
+                    #[rustfmt::skip]
+                    emission: Colour {red: 1.0, green: 1.0, blue: 0.6,},
+                }
             );
         }
     }
