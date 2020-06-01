@@ -2,7 +2,7 @@ use image::{ImageBuffer, Rgb};
 use nalgebra::{Isometry3, Point2, Point3, Rotation3, Similarity3, Translation3, Vector3};
 
 use rustracer::primitives::Triangle;
-use rustracer::{Colour, Material, Scene, Viewport};
+use rustracer::{Colour, Material, Scalar, Scene, Viewport};
 
 fn main() {
     let up_triangle = Triangle::new([
@@ -14,7 +14,7 @@ fn main() {
     let scale = Similarity3::from_scaling(0.5f32);
     let translate_red = Translation3::new(0.0f32, 0.4, 1.5);
     let translate_green = Translation3::new(0.0f32, 0.6, 2.5);
-    let rotate = Rotation3::new(Vector3::new(0.0f32, 3.14 * 0.1, 0.0));
+    let rotate = Rotation3::new(Vector3::new(0.0f32, std::f32::consts::PI * 0.1, 0.0));
     let mut scene = Scene::new(
         Material {
             #[rustfmt::skip]
@@ -54,9 +54,10 @@ fn main() {
     let viewport = Viewport::new(
         image_data.width(),
         image_data.height(),
-        3.14 / 2.0,
+        std::f32::consts::PI / 2.0,
         1.0,
         1000.0,
+        2,
     );
 
     let eye = Point3::new(0.0f32, 0.0, 5.0);
@@ -64,8 +65,13 @@ fn main() {
     let camera = Isometry3::look_at_rh(&eye, &target, &Vector3::y()).inverse();
 
     for (x, y, pixel) in image_data.enumerate_pixels_mut() {
-        let ray = &camera * &viewport.cast_ray(Point2::new(x, y));
-        let colour: Rgb<u8> = scene.trace(&ray).into();
+        let colour = viewport
+            .cast_ray(Point2::new(x, y))
+            .map(|ray| camera * ray)
+            .map(|ray| scene.trace(&ray))
+            .fold(Colour::default(), |acc, x| acc + x)
+            / viewport.get_rays_count() as Scalar;
+        let colour: Rgb<u8> = colour.into();
         *pixel = colour;
     }
     image_data.save("image.png").unwrap();

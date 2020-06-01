@@ -34,8 +34,8 @@ impl Scene {
     /// Creates new scene
     pub fn new(default_material: Material, recursion_depth: usize) -> Self {
         Self {
-            default_material: default_material,
-            recursion_depth: recursion_depth,
+            default_material,
+            recursion_depth,
             triangles: PrimitivesWithMaterials::new(),
         }
     }
@@ -95,10 +95,10 @@ impl Scene {
 impl<P: RayTraceable> PrimitivesWithMaterials<P> {
     /// Creates new Scene helper
     pub fn new() -> Self {
-        return Self {
+        Self {
             primitives: Vec::new(),
             materials: Vec::new(),
-        };
+        }
     }
     /// Adds primitive with material and keeps indices synchronized
     pub fn add(&mut self, primitive: P, material: Material) {
@@ -177,7 +177,7 @@ mod tests {
             Point3::new(0.0, 1.0, 0.0),
             Point3::new(-1.0, -1.0, 0.0),
         ]);
-        let rotation = Rotation3::new(Vector3::new(0.0f32, 3.14 * 0.1, 0.0));
+        let rotation = Rotation3::new(Vector3::new(0.0f32, std::f32::consts::PI * 0.1, 0.0));
 
         // Yellow triangle partially hidden by red triangle. Both rotated,
         // to get red 'shadow' on yellow triangle.
@@ -209,8 +209,8 @@ mod tests {
         );
         // Ray into yellow triangle
         let ray = Ray::new(
-            Point3::new(0.04329888, 0.07993634, 4.0),
-            Vector3::new(0.04312106, 0.07960805, -0.9958931),
+            Point3::new(0.04329_888, 0.07993_634, 4.0),
+            Vector3::new(0.04312_106, 0.07960_805, -0.9958_931),
         );
         #[rustfmt::skip]
         assert_eq!(

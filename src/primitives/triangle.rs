@@ -16,7 +16,7 @@ pub struct Triangle {
 impl Triangle {
     pub fn new(vertices: [Point3; 3]) -> Self {
         Self {
-            vertices: vertices,
+            vertices,
             normal: Triangle::calculate_normal(vertices),
         }
     }
@@ -119,6 +119,7 @@ impl_op_ex!(*|a: &Matrix4, b: &Triangle| -> Triangle {
     ])
 });
 
+#[allow(clippy::op_ref)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -196,7 +197,7 @@ mod tests {
         let mat = Matrix3::new(
             1.0, 2.0, 3.0,
             3.0, 1.5, -7.0,
-            -3.14, 1.57, -3.0
+            -std::f32::consts::PI, 1.57, -3.0
         );
         let expected = Triangle::new([
             mat * Point3::new(1.0, 0.0, 0.0),
@@ -322,7 +323,7 @@ mod tests {
         let transform = Transform3::from_matrix_unchecked(Matrix4::new(
             1.0, 2.0, 3.0, 0.0,
             3.0, 1.5, -7.0, 0.0,
-            -3.14, 1.57, -3.0, 0.0,
+            -std::f32::consts::PI, 1.57, -3.0, 0.0,
             0.0, 1.57, 0.0, 1.0,
         ));
         let expected = Triangle::new([

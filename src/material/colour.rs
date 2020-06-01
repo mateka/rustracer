@@ -124,6 +124,7 @@ impl_op_ex!(/=|c: &mut Colour, s: &f32| {
     c.blue /= s;
 });
 
+#[allow(clippy::op_ref)]
 #[cfg(test)]
 mod tests {
     use super::*;

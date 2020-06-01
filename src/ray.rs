@@ -16,7 +16,7 @@ pub struct Ray {
 impl Ray {
     pub fn new(origin: Point3, direction: Vector3) -> Self {
         Self {
-            origin: origin,
+            origin,
             direction: Unit::new_normalize(direction),
         }
     }
@@ -94,6 +94,7 @@ impl_op_ex!(*|a: &Matrix4, b: &Ray| -> Ray {
     }
 });
 
+#[allow(clippy::op_ref)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -103,15 +104,12 @@ mod tests {
     fn ray_can_be_multiplied_by_3d_matrix() {
         let origin = Point3::new(1.0, 2.0, -7.0);
         let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
-        let ray = Ray {
-            origin: origin,
-            direction: direction,
-        };
+        let ray = Ray { origin, direction };
         #[rustfmt::skip]
         let mat = Matrix3::new(
             1.0, 2.0, 3.0,
             3.0, 1.5, -7.0,
-            -3.14, 1.57, -3.0
+            -std::f32::consts::PI, 1.57, -3.0
         );
         let expected = Ray {
             origin: mat * origin,
@@ -128,10 +126,7 @@ mod tests {
     fn ray_can_be_rotated() {
         let origin = Point3::new(1.0, 2.0, -7.0);
         let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
-        let ray = Ray {
-            origin: origin,
-            direction: direction,
-        };
+        let ray = Ray { origin, direction };
         let rotation = Rotation3::new(Vector3::new(1.57, 0.0, -0.75));
         let expected = Ray {
             origin: rotation * origin,
@@ -148,14 +143,11 @@ mod tests {
     fn ray_can_be_translated() {
         let origin = Point3::new(1.0, 2.0, -7.0);
         let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
-        let ray = Ray {
-            origin: origin,
-            direction: direction,
-        };
+        let ray = Ray { origin, direction };
         let translation = Translation3::new(-1.0, 2.5, 0.0);
         let expected = Ray {
             origin: translation * origin,
-            direction: direction,
+            direction,
         };
 
         assert_eq!(translation * ray, expected);
@@ -168,10 +160,7 @@ mod tests {
     fn ray_can_be_rotated_and_translated_by_two_transforms() {
         let origin = Point3::new(1.0, 2.0, -7.0);
         let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
-        let ray = Ray {
-            origin: origin,
-            direction: direction,
-        };
+        let ray = Ray { origin, direction };
         let rotation = Rotation3::new(Vector3::new(1.57, 0.0, -0.75));
         let translation = Translation3::new(-1.0, 2.5, 0.0);
         let expected = Ray {
@@ -187,10 +176,7 @@ mod tests {
     fn ray_can_be_rotated_and_translated() {
         let origin = Point3::new(1.0, 2.0, -7.0);
         let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
-        let ray = Ray {
-            origin: origin,
-            direction: direction,
-        };
+        let ray = Ray { origin, direction };
         let isometry = Isometry3::new(Vector3::new(-1.0, 2.5, 0.0), Vector3::new(1.57, 0.0, -0.75));
         let expected = Ray {
             origin: isometry * origin,
@@ -207,10 +193,7 @@ mod tests {
     fn ray_can_be_transformed_into_similar_ray() {
         let origin = Point3::new(1.0, 2.0, -7.0);
         let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
-        let ray = Ray {
-            origin: origin,
-            direction: direction,
-        };
+        let ray = Ray { origin, direction };
         let translation = Translation3::new(-1.0, 2.5, 0.0);
         let rotation = Unit::new_normalize(Quaternion::new(1.75, 0.0, 1.0, 2.0));
         let similarity = Similarity3::from_parts(translation, rotation, 2.0);
@@ -229,15 +212,12 @@ mod tests {
     fn ray_can_be_transformed() {
         let origin = Point3::new(1.0, 2.0, -7.0);
         let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
-        let ray = Ray {
-            origin: origin,
-            direction: direction,
-        };
+        let ray = Ray { origin, direction };
         #[rustfmt::skip]
         let transform = Transform3::from_matrix_unchecked(Matrix4::new(
             1.0, 2.0, 3.0, 0.0,
             3.0, 1.5, -7.0, 0.0,
-            -3.14, 1.57, -3.0, 0.0,
+            -std::f32::consts::PI, 1.57, -3.0, 0.0,
             0.0, 1.57, 0.0, 1.0,
         ));
         let expected = Ray {
@@ -255,10 +235,7 @@ mod tests {
     fn ray_can_be_multiplied_by_4d_matrix() {
         let origin = Point3::new(1.0, 2.0, -7.0);
         let direction = Unit::new_normalize(Vector3::new(1.0, 1.0, 1.0));
-        let ray = Ray {
-            origin: origin,
-            direction: direction,
-        };
+        let ray = Ray { origin, direction };
         #[rustfmt::skip]
         let matrix = Matrix4::new_scaling(2.0);
         let expected = Ray {
