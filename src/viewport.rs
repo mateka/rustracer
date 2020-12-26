@@ -1,4 +1,5 @@
 use crate::{Point2, Point3, Ray, Scalar, Vector2};
+use noise::{NoiseFn, OpenSimplex};
 
 pub type Perspective3 = nalgebra::Perspective3<Scalar>;
 pub type ScreenPoint = nalgebra::Point2<u32>;
@@ -21,10 +22,13 @@ impl Viewport {
         zfar: Scalar,
         point_rays_count: usize,
     ) -> Self {
-        let noise = simdnoise::NoiseBuilder::fbm_2d(point_rays_count, 2).generate_scaled(-0.5, 0.5);
-        let x_coords = noise.iter().step_by(2);
-        let y_coords = noise.iter().skip(1).step_by(2);
-        let coords = x_coords.zip(y_coords).map(|(x, y)| Vector2::new(*x, *y));
+        let noise = OpenSimplex::new();
+        let coords = (0..point_rays_count)
+            .map(|_| {
+                let pt = [0.0, 0.0];
+                Vector2::new(noise.get(pt) as f32, noise.get(pt) as f32)
+            })
+            .map(|v| v * 0.5);
         Self {
             width: width as Scalar,
             height: height as Scalar,

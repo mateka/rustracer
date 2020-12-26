@@ -8,6 +8,6 @@ edition = "2018"
 
 [dependencies]
 auto_ops = "0.1.0"
-nalgebra = "0.21.0"
+nalgebra = "0.23.1"
 image = "0.23.4"
-simdnoise = "3.1.6"
+noise = "0.7.0"

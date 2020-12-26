@@ -57,7 +57,7 @@ fn main() {
         std::f32::consts::PI / 2.0,
         1.0,
         1000.0,
-        2,
+        5,
     );
 
     let eye = Point3::new(0.0f32, 0.0, 5.0);
