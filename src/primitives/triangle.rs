@@ -48,6 +48,10 @@ impl RayTraceable for Triangle {
         self.normal
     }
 
+    fn get_size(&self) -> Scalar {
+        Triangle::doubled_area_of(self.vertices) * 0.5
+    }
+
     fn intersects(&self, ray: &Ray) -> Option<Point3> {
         let v0v1 = self.get_v(1) - self.get_v(0);
         let v0v2 = self.get_v(2) - self.get_v(0);
@@ -140,6 +144,17 @@ mod tests {
             tri.get_normal(),
             Unit::new_normalize(Vector3::new(0.0, 0.0, 1.0))
         );
+    }
+
+    #[test]
+    fn triangle_size_is_equal_to_its_area() {
+        let tri = Triangle::new([
+            Point3::new(0.0, 4.0, 0.0),
+            Point3::new(-0.5, 0.0, 0.0),
+            Point3::new(0.5, 0.0, 0.0),
+        ]);
+
+        assert!((tri.get_size() - 2.0) < f32::EPSILON);
     }
 
     #[test]

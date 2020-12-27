@@ -1,5 +1,8 @@
-use crate::{primitives::Triangle, Colour, Material, Point3, Ray, RayTraceable, Scalar};
+use crate::{
+    primitives::Triangle, Colour, Material, Point3, Ray, RayTraceable, Rotation3, Scalar, Vector3,
+};
 use nalgebra::{Reflection, Unit};
+use rand::prelude::*;
 
 /// Helper struct describing hit result
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -27,15 +30,17 @@ struct PrimitivesWithMaterials<P: RayTraceable> {
 pub struct Scene {
     default_material: Material,
     recursion_depth: usize,
+    beam_rays_count: usize,
     triangles: PrimitivesWithMaterials<Triangle>,
 }
 
 impl Scene {
     /// Creates new scene
-    pub fn new(default_material: Material, recursion_depth: usize) -> Self {
+    pub fn new(default_material: Material, recursion_depth: usize, beam_rays_count: usize) -> Self {
         Self {
             default_material,
             recursion_depth,
+            beam_rays_count,
             triangles: PrimitivesWithMaterials::new(),
         }
     }
@@ -59,16 +64,19 @@ impl Scene {
         let mut trace_result = TraceResult {
             ..Default::default()
         };
+        let material = self.triangles.get_material(hit.index);
 
         if step < self.recursion_depth {
             let reflected_ray = self.get_reflected_ray(&ray, &hit);
-            let tr = self.trace_until(&reflected_ray, step + 1);
-            trace_result.add_light(&tr);
+            let primitive_size = self.triangles.get_primitive(hit.index).get_size();
+            for beam_ray in self.get_beam(reflected_ray, primitive_size) {
+                let tr = self.trace_until(&beam_ray, step + 1);
+                trace_result.add_light(&tr);
+            }
+            trace_result.emission /= self.beam_rays_count as Scalar;
         } else {
             trace_result = TraceResult::from(self.default_material);
         }
-
-        let material = self.triangles.get_material(hit.index);
         trace_result.apply_to(material)
     }
 
@@ -89,6 +97,21 @@ impl Scene {
             origin: hit.point + 2.0 * Scalar::EPSILON * reflected_direction.into_inner(),
             direction: reflected_direction,
         }
+    }
+
+    fn get_beam(&self, ray: Ray, primitive_size: Scalar) -> impl Iterator<Item = Ray> {
+        let rotation =
+            Rotation3::rotation_between(&Vector3::new(0.0, 0.0, 1.0), &ray.direction.into_inner())
+                .unwrap_or_else(Rotation3::identity);
+        let mut randomness = thread_rng();
+        (0..self.beam_rays_count)
+            .map(move |_| {
+                let r = randomness.gen_range(0.0..(0.005 * primitive_size));
+                let alpha = randomness.gen_range(0.0..(2.0 * std::f32::consts::PI));
+                Vector3::new(r * alpha.cos(), r * alpha.sin(), 0.0)
+            })
+            .map(move |circle_vec| rotation * circle_vec)
+            .map(move |v| Ray::new(ray.origin, ray.direction.into_inner() + v))
     }
 }
 
@@ -117,6 +140,7 @@ impl<P: RayTraceable> PrimitivesWithMaterials<P> {
                 None => None,
             })
             .map(|(i, p)| (i, p, (p - ray.origin).norm()))
+            .filter(|(_, _, d)| !d.is_nan())
             .min_by(|&(_, _, d1), &(_, _, d2)| d1.partial_cmp(&d2).unwrap())?;
 
         Some(HitResult {
@@ -142,7 +166,7 @@ impl TraceResult {
     pub fn apply_to(&self, material: &Material) -> Self {
         Self {
             emission: material.emission + material.diffuse * self.emission,
-            diffuse: material.diffuse * self.emission,
+            diffuse: material.emission + material.diffuse * self.emission,
         }
     }
 }
@@ -171,6 +195,7 @@ mod tests {
                 emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
             },
             2,
+            1,
         );
         let triangle = Triangle::new([
             Point3::new(1.0, -1.0, 0.0),
@@ -249,6 +274,7 @@ mod tests {
                     emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                 },
                 0,
+                1,
             );
             let ray = Ray::new(Point3::new(0.0, 0.0, -1.0), Vector3::new(0.0, 0.0, 1.0));
             #[rustfmt::skip]
@@ -265,6 +291,7 @@ mod tests {
                     emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                 },
                 0,
+                1,
             );
             scene.add_triangle(
                 Triangle::new([
@@ -293,6 +320,7 @@ mod tests {
                     emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                 },
                 0,
+                1,
             );
             scene.add_triangle(
                 Triangle::new([
@@ -321,6 +349,7 @@ mod tests {
                     emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
                 },
                 0,
+                1,
             );
             scene.add_triangle(
                 Triangle::new([

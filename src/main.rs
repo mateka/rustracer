@@ -11,29 +11,31 @@ fn main() {
         Point3::new(-1.0, 0.0, 0.0),
     ]);
 
-    let scale = Similarity3::from_scaling(0.5f32);
-    let translate_red = Translation3::new(0.0f32, 0.4, 1.5);
-    let translate_green = Translation3::new(0.0f32, 0.6, 2.5);
-    let rotate = Rotation3::new(Vector3::new(0.0f32, std::f32::consts::PI * 0.1, 0.0));
+    let world = Translation3::new(-1.0f32, -0.5, 0.0)
+        * Rotation3::new(Vector3::new(0.0f32, std::f32::consts::PI * 0.1, 0.0));
     let mut scene = Scene::new(
         Material {
             #[rustfmt::skip]
             diffuse: Colour {red: 0.0, green: 0.0, blue: 0.0,},
             #[rustfmt::skip]
-            emission: Colour {red: 0.75, green: 0.75, blue: 1.0,},
+            emission: Colour {red: 0.0, green: 0.0, blue: 0.0,},
         },
-        10,
+        5,
+        5,
     );
     scene.add_triangle(
-        rotate * up_triangle,
+        world * up_triangle,
         Material {
             #[rustfmt::skip]
             diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
-            ..Default::default()
+            #[rustfmt::skip]
+            emission: Colour {red: 1.0, green: 1.0, blue: 0.0,},
         },
     );
     scene.add_triangle(
-        rotate * translate_red * (scale * up_triangle),
+        world
+            * Translation3::new(0.15f32, 0.15, 1.0)
+            * (Similarity3::from_scaling(0.5f32) * up_triangle),
         Material {
             #[rustfmt::skip]
             diffuse: Colour {red: 1.0, green: 0.0, blue: 0.0,},
@@ -41,15 +43,28 @@ fn main() {
         },
     );
     scene.add_triangle(
-        rotate * translate_green * (scale * up_triangle),
+        world
+            * Translation3::new(0.25f32, 0.25, 1.5)
+            * (Similarity3::from_scaling(0.25f32) * up_triangle),
         Material {
             #[rustfmt::skip]
             diffuse: Colour {red: 0.2, green: 1.0, blue: 0.0,},
             ..Default::default()
         },
     );
+    scene.add_triangle(
+        world
+            * Translation3::new(0.0f32, -1.0, 6.0)
+            * (Similarity3::from_scaling(2.5f32) * up_triangle),
+        Material {
+            #[rustfmt::skip]
+            diffuse: Colour {red: 1.0, green: 1.0, blue: 1.0,},
+            #[rustfmt::skip]
+            emission: Colour {red: 1.0, green: 1.0, blue: 1.0,},
+        },
+    );
 
-    let mut image_data = ImageBuffer::new(400, 300);
+    let mut image_data = ImageBuffer::new(800, 600);
 
     let viewport = Viewport::new(
         image_data.width(),
@@ -57,7 +72,7 @@ fn main() {
         std::f32::consts::PI / 2.0,
         1.0,
         1000.0,
-        5,
+        100,
     );
 
     let eye = Point3::new(0.0f32, 0.0, 5.0);

@@ -27,6 +27,9 @@ pub trait RayTraceable {
     /// Returns normal vector to the traceable object
     fn get_normal(&self) -> Unit<Vector3>;
 
+    /// Returns size of the traceable object
+    fn get_size(&self) -> Scalar;
+
     /// Computes point of intersection of Self with ray.
     /// If there is no intersection, it returns None.
     fn intersects(&self, ray: &Ray) -> Option<Point3>;
