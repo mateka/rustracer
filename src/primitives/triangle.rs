@@ -102,7 +102,7 @@ impl_op_ex!(*|a: &Isometry3, b: &Triangle| -> Triangle {
 });
 
 impl_op_ex!(
-    *|a: &nalgebra::Isometry<Scalar, nalgebra::U3, Rotation3>, b: &Triangle| -> Triangle {
+    *|a: &nalgebra::Isometry<Scalar, Rotation3, 3>, b: &Triangle| -> Triangle {
         Triangle::new([a * b.vertices[0], a * b.vertices[1], a * b.vertices[2]])
     }
 );

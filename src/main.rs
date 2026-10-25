@@ -1,3 +1,5 @@
+use std::thread;
+
 use image::{ImageBuffer, Rgb};
 use nalgebra::{Isometry3, Point2, Point3, Rotation3, Similarity3, Translation3, Vector3};
 
@@ -30,6 +32,17 @@ fn main() {
             diffuse: Colour {red: 1.0, green: 1.0, blue: 0.0,},
             #[rustfmt::skip]
             emission: Colour {red: 1.0, green: 1.0, blue: 0.0,},
+        },
+    );
+    scene.add_triangle(
+        world * Translation3::new(-1.0, 0.25, 1.0) * up_triangle,
+        Material {
+            diffuse: Colour {
+                red: 1.0,
+                blue: 0.1,
+                green: 1.0,
+            },
+            ..Default::default()
         },
     );
     scene.add_triangle(
@@ -79,15 +92,22 @@ fn main() {
     let target = Point3::new(0.0f32, 0.0, 0.0);
     let camera = Isometry3::look_at_rh(&eye, &target, &Vector3::y()).inverse();
 
-    for (x, y, pixel) in image_data.enumerate_pixels_mut() {
-        let colour = viewport
-            .cast_ray(Point2::new(x, y))
-            .map(|ray| camera * ray)
-            .map(|ray| scene.trace(&ray))
-            .fold(Colour::default(), |acc, x| acc + x)
-            / viewport.get_rays_count() as Scalar;
-        let colour: Rgb<u8> = colour.into();
-        *pixel = colour;
-    }
-    image_data.save("image.png").unwrap();
+    let camera1 = camera.clone();
+    let scene1 = scene.clone();
+    let viewport1 = viewport.clone();
+    let handle = thread::spawn(move || {
+        for (x, y, pixel) in image_data.enumerate_pixels_mut() {
+            let colour = viewport1
+                .cast_ray(Point2::new(x, y))
+                .map(|ray| camera1 * ray)
+                .map(|ray| scene1.trace(&ray))
+                .fold(Colour::default(), |acc, x| acc + x)
+                / viewport1.get_rays_count() as Scalar;
+            let colour: Rgb<u8> = colour.into();
+            *pixel = colour;
+        }
+        image_data.save("image.png").unwrap();
+    });
+
+    handle.join().unwrap();
 }

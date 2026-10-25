@@ -2,7 +2,7 @@ use crate::{
     primitives::Triangle, Colour, Material, Point3, Ray, RayTraceable, Rotation3, Scalar, Vector3,
 };
 use nalgebra::{Reflection, Unit};
-use rand::prelude::*;
+use rand::{prelude::*, rng};
 
 /// Helper struct describing hit result
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -103,11 +103,11 @@ impl Scene {
         let rotation =
             Rotation3::rotation_between(&Vector3::new(0.0, 0.0, 1.0), &ray.direction.into_inner())
                 .unwrap_or_else(Rotation3::identity);
-        let mut randomness = thread_rng();
+        let mut randomness = rng();
         (0..self.beam_rays_count)
             .map(move |_| {
-                let r = randomness.gen_range(0.0..(0.005 * primitive_size));
-                let alpha = randomness.gen_range(0.0..(2.0 * std::f32::consts::PI));
+                let r = randomness.random_range(0.0..(0.005 * primitive_size));
+                let alpha = randomness.random_range(0.0..(2.0 * std::f32::consts::PI));
                 Vector3::new(r * alpha.cos(), r * alpha.sin(), 0.0)
             })
             .map(move |circle_vec| rotation * circle_vec)

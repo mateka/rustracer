@@ -68,7 +68,7 @@ impl_op_ex!(*|a: &Isometry3, b: &Ray| -> Ray {
 });
 
 impl_op_ex!(
-    *|a: &nalgebra::Isometry<Scalar, nalgebra::U3, Rotation3>, b: &Ray| -> Ray {
+    *|a: &nalgebra::Isometry<Scalar, Rotation3, 3>, b: &Ray| -> Ray {
         Ray {
             origin: a * b.origin,
             direction: Unit::new_normalize(a * b.direction.into_inner()),

@@ -22,7 +22,7 @@ impl Viewport {
         zfar: Scalar,
         point_rays_count: usize,
     ) -> Self {
-        let noise = OpenSimplex::new();
+        let noise = OpenSimplex::new(12357);
         let coords = (0..point_rays_count)
             .map(|_| {
                 let pt = [0.0, 0.0];
@@ -91,8 +91,8 @@ mod tests {
     #[test]
     fn viewport_creation() {
         let vp = Viewport::new(640, 480, 2.0, 1.0, 100.0, 2);
-        assert!(vp.get_width() - 640.0 <= std::f32::EPSILON);
-        assert!(vp.get_height() - 480.0 <= std::f32::EPSILON);
+        assert!(vp.get_width() - 640.0 <= f32::EPSILON);
+        assert!(vp.get_height() - 480.0 <= f32::EPSILON);
         assert_eq!(vp.get_rays_count(), 2);
     }
 
