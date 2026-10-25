@@ -2,8 +2,8 @@ use auto_ops::*;
 use nalgebra::Unit;
 
 use crate::{
-    ray::RayTraceable, Isometry3, Matrix3, Matrix4, Point2, Point3, Ray, Rotation3, Scalar,
-    Similarity3, Transform3, Translation3, Vector3,
+    Isometry3, Matrix3, Matrix4, Point2, Point3, Ray, Rotation3, Scalar, Similarity3, Transform3,
+    Translation3, Vector3, ray::RayTraceable,
 };
 
 /// A triangle primitive

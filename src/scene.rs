@@ -1,5 +1,5 @@
 use crate::{
-    primitives::Triangle, Colour, Material, Point3, Ray, RayTraceable, Rotation3, Scalar, Vector3,
+    Colour, Material, Point3, Ray, RayTraceable, Rotation3, Scalar, Vector3, primitives::Triangle,
 };
 use nalgebra::{Reflection, Unit};
 use rand::{prelude::*, rng};
