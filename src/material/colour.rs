@@ -29,9 +29,9 @@ impl From<Rgb<u8>> for Colour {
     }
 }
 
-impl Into<Rgb<u8>> for Colour {
-    fn into(self) -> Rgb<u8> {
-        let self_byted = self.clamped() * 255.0;
+impl From<Colour> for Rgb<u8> {
+    fn from(val: Colour) -> Self {
+        let self_byted = val.clamped() * 255.0;
         Rgb([
             self_byted.red as u8,
             self_byted.green as u8,

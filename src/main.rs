@@ -92,7 +92,7 @@ fn main() {
     let target = Point3::new(0.0f32, 0.0, 0.0);
     let camera = Isometry3::look_at_rh(&eye, &target, &Vector3::y()).inverse();
 
-    let camera1 = camera.clone();
+    let camera1 = camera;
     let scene1 = scene.clone();
     let viewport1 = viewport.clone();
     let handle = thread::spawn(move || {

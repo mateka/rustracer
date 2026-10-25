@@ -154,7 +154,7 @@ mod tests {
             Point3::new(0.5, 0.0, 0.0),
         ]);
 
-        assert!((tri.get_size() - 2.0) < f32::EPSILON);
+        assert!((tri.get_size() - 2.0).abs() < f32::EPSILON);
     }
 
     #[test]

@@ -57,7 +57,7 @@ impl Scene {
 
     fn trace_until(&self, ray: &Ray, step: usize) -> TraceResult {
         let hit = self.closest_hit(ray);
-        if hit == None {
+        if hit.is_none() {
             return TraceResult::from(self.default_material);
         }
         let hit = hit.unwrap();
@@ -67,7 +67,7 @@ impl Scene {
         let material = self.triangles.get_material(hit.index);
 
         if step < self.recursion_depth {
-            let reflected_ray = self.get_reflected_ray(&ray, &hit);
+            let reflected_ray = self.get_reflected_ray(ray, &hit);
             let primitive_size = self.triangles.get_primitive(hit.index).get_size();
             for beam_ray in self.get_beam(reflected_ray, primitive_size) {
                 let tr = self.trace_until(&beam_ray, step + 1);
@@ -135,10 +135,7 @@ impl<P: RayTraceable> PrimitivesWithMaterials<P> {
             .primitives
             .iter()
             .enumerate()
-            .filter_map(|(i, t)| match t.intersects(&ray) {
-                Some(p) => Some((i, p)),
-                None => None,
-            })
+            .filter_map(|(i, t)| t.intersects(ray).map(|p| (i, p)))
             .map(|(i, p)| (i, p, (p - ray.origin).norm()))
             .filter(|(_, _, d)| !d.is_nan())
             .min_by(|&(_, _, d1), &(_, _, d2)| d1.partial_cmp(&d2).unwrap())?;
