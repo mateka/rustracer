@@ -99,7 +99,7 @@ impl Scene {
         }
     }
 
-    fn get_beam(&self, ray: Ray, primitive_size: Scalar) -> impl Iterator<Item = Ray> {
+    fn get_beam(&self, ray: Ray, primitive_size: Scalar) -> impl Iterator<Item = Ray> + use<> {
         let rotation =
             Rotation3::rotation_between(&Vector3::new(0.0, 0.0, 1.0), &ray.direction.into_inner())
                 .unwrap_or_else(Rotation3::identity);
